@@ -31,6 +31,7 @@
             @blur="validateField('password', password)"
           />
           <FormError v-if="errors.password" :message="errors.password" />
+          <FormError v-if="userStore.authError" :message="userStore.authError" />
 
           <q-btn
             type="submit"

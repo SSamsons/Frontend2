@@ -49,11 +49,7 @@ export const useUserStore = defineStore('user', () => {
     loading.value = false;
 
     if (!result.success) {
-      const offline =
-        result.error.type === 'NOT_FOUND' ||
-        result.error.message.includes('Сеть недоступна') ||
-        result.error.message.includes('Не удалось выполнить запрос');
-      const local = offline ? localDemoLogin(input.email, input.password) : null;
+      const local = localDemoLogin(input.email, input.password);
 
       if (local) {
         state.value = { ...state.value, user: local.user, token: local.token };
