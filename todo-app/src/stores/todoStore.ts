@@ -12,6 +12,7 @@ import {
 import { useUserStore } from '@/stores/userStore';
 import type { ApiResult } from '@/types/api';
 import type { CreateTodoInput, ITodoItem, StoredTodoPrefs, TodoFilterType } from '@/types/todo';
+import { isLocalToken } from '@/utils/localDemo';
 
 const PREFS_KEY = 'todo-app-prefs';
 
@@ -78,6 +79,29 @@ export const useTodoStore = defineStore('todo', () => {
     error.value = message;
   }
 
+  function itemsKey(): string {
+    return `todo-app-items-${userStore.user?.id ?? 0}`;
+  }
+
+  function readLocalTodos(): ITodoItem[] {
+    const raw = localStorage.getItem(itemsKey());
+    if (!raw) return [];
+    try {
+      const parsed: unknown = JSON.parse(raw);
+      return Array.isArray(parsed) ? (parsed as ITodoItem[]) : [];
+    } catch {
+      return [];
+    }
+  }
+
+  function writeLocalTodos(items: ITodoItem[]): void {
+    localStorage.setItem(itemsKey(), JSON.stringify(items));
+  }
+
+  function usingLocalApi(): boolean {
+    return isLocalToken(userStore.token);
+  }
+
   async function loadTodos(): Promise<ApiResult<ITodoItem[]>> {
     if (!userStore.user) {
       _todos.value = [];
@@ -85,6 +109,33 @@ export const useTodoStore = defineStore('todo', () => {
         success: false,
         error: { type: 'STORAGE_ERROR', message: 'Пользователь не авторизован' },
       };
+    }
+
+    if (usingLocalApi()) {
+      let items = readLocalTodos();
+      if (items.length === 0) {
+        items = [
+          {
+            id: 1,
+            userId: userStore.user.id,
+            title: 'Открыть список дел',
+            completed: false,
+            createdAt: new Date().toISOString(),
+            tagIds: [],
+          },
+          {
+            id: 2,
+            userId: userStore.user.id,
+            title: 'Отметить готовую задачу',
+            completed: true,
+            createdAt: new Date().toISOString(),
+            tagIds: [],
+          },
+        ];
+        writeLocalTodos(items);
+      }
+      _todos.value = items;
+      return { success: true, data: items };
     }
 
     loading.value = true;
@@ -116,6 +167,20 @@ export const useTodoStore = defineStore('todo', () => {
       return authError;
     }
 
+    if (usingLocalApi()) {
+      const created: ITodoItem = {
+        id: Date.now(),
+        userId: userStore.user.id,
+        title: input.title,
+        completed: false,
+        createdAt: new Date().toISOString(),
+        tagIds: [],
+      };
+      _todos.value = [..._todos.value, created];
+      writeLocalTodos(_todos.value);
+      return { success: true, data: created };
+    }
+
     loading.value = true;
     error.value = null;
 
@@ -142,6 +207,13 @@ export const useTodoStore = defineStore('todo', () => {
       error.value = notFound.error.message;
       handleError(notFound.error, 'todoStore.toggleTodo');
       return notFound;
+    }
+
+    if (usingLocalApi()) {
+      const updated = { ...todo, completed: !todo.completed };
+      _todos.value = _todos.value.map((item) => (item.id === id ? updated : item));
+      writeLocalTodos(_todos.value);
+      return { success: true, data: updated };
     }
 
     loading.value = true;
@@ -172,6 +244,12 @@ export const useTodoStore = defineStore('todo', () => {
       error.value = notFound.error.message;
       handleError(notFound.error, 'todoStore.deleteTodo');
       return notFound;
+    }
+
+    if (usingLocalApi()) {
+      _todos.value = _todos.value.filter((item) => item.id !== id);
+      writeLocalTodos(_todos.value);
+      return { success: true, data: { id } };
     }
 
     loading.value = true;

@@ -5,6 +5,7 @@ import { login as loginRequest, refreshToken } from '@/services/authService';
 import { useErrorHandler } from '@/composables/useErrorHandler';
 import type { ApiResult } from '@/types/api';
 import type { LoginInput, LoginResponse, StoredUserState, UserSettings, IUser } from '@/types/user';
+import { localDemoLogin } from '@/utils/localDemo';
 
 const STORAGE_KEY = 'todo-app-user';
 
@@ -48,6 +49,17 @@ export const useUserStore = defineStore('user', () => {
     loading.value = false;
 
     if (!result.success) {
+      const offline =
+        result.error.type === 'NOT_FOUND' ||
+        result.error.message.includes('Сеть недоступна') ||
+        result.error.message.includes('Не удалось выполнить запрос');
+      const local = offline ? localDemoLogin(input.email, input.password) : null;
+
+      if (local) {
+        state.value = { ...state.value, user: local.user, token: local.token };
+        return { success: true, data: local };
+      }
+
       error.value = result.error.message;
       handleError(result.error, 'userStore.login');
       return result;

@@ -150,7 +150,7 @@ git push origin main
 
 ### Шаг 2. Включить GitHub Pages
 
-1. Открой репозиторий: https://github.com/SSamsons/FrontendLabs2
+1. Открой репозиторий: https://github.com/SSamsons/Frontend2
 2. Перейди в **Settings → Pages**
 3. В блоке **Build and deployment** выбери:
    - **Source:** **GitHub Actions** (не «Deploy from a branch»!)
@@ -159,10 +159,10 @@ git push origin main
 ### Шаг 3. Дождаться деплоя
 
 1. Открой вкладку **Actions** в репозитории
-2. После push в `main` запустится workflow **Deploy to GitHub Pages**
+2. После push в `master` запустится workflow **Deploy to GitHub Pages**
 3. Когда job станет зелёным, сайт будет доступен по адресу:
 
-   **https://ssamsons.github.io/FrontendLabs2/**
+   **https://ssamsons.github.io/Frontend2/#/**
 
 > Имя в URL всегда совпадает с именем репозитория на GitHub (регистр важен).
 
@@ -170,11 +170,11 @@ git push origin main
 
 Чаще всего причина — в **Settings → Pages** выбран источник **Deploy from a branch** (ветка `main`, папка `/`). Тогда GitHub отдаёт исходный `index.html` без JavaScript — страница белая.
 
-**Решение:** выбери источник **GitHub Actions**, запушь изменения в `main` и дождись зелёного workflow **Deploy to GitHub Pages**.
+**Решение:** выбери источник **GitHub Actions**, запушь изменения в `master` и дождись зелёного workflow **Deploy to GitHub Pages**.
 
-Открой сайт по адресу `https://<твой-логин>.github.io/<имя-репозитория>/` (например `/FrontendLabs2/`).
+Открой сайт по адресу `https://ssamsons.github.io/Frontend2/#/`.
 
-> На GitHub Pages нет mock API. Логин и задачи через `/api` работают только локально (`npm run mock` + `npm run dev`). На проде приложение откроется, но авторизация без бэкенда не сработает.
+> На GitHub Pages нет mock API. Тестовые `user@test.com` / `123456` и `admin@test.com` / `admin123` входят локально в браузере, задачи сохраняются там же. Полный API работает локально: `npm run mock` и `npm run dev`.
 
 ---
 

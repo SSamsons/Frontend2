@@ -9,15 +9,16 @@
   "scripts": {
     "lint": "prettier --write \"**/*.{js,ts,vue,css,html,md,json}\" --ignore-path .gitignore && eslint --fix -c ./eslint.config.js \"./src*/**/*.{ts,js,cjs,mjs,vue}\"",
     "lint:check": "prettier \"**/*.{js,ts,vue,css,html,md,json}\" --ignore-path .gitignore && eslint -c ./eslint.config.js \"./src*/**/*.{ts,js,cjs,mjs,vue}\"",
-    "dev": "quasar dev",
+    "dev": "node scripts/patch-quasar-node.mjs && quasar dev",
     "mock": "npm run start --prefix mock",
-    "build": "quasar build",
+    "build": "node scripts/patch-quasar-node.mjs && quasar build",
     "build:analyze": "quasar build && npx vite-bundle-visualizer dist/spa",
+    "deploy": "ansible-playbook ../ansible/run_service.yml -i ../ansible/inventory.yml",
     "typecheck": "vue-tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "postinstall": "quasar prepare --silent"
+    "postinstall": "node scripts/patch-quasar-node.mjs && quasar prepare --silent"
   },
   "dependencies": {
     "@quasar/extras": "^2.0.0",
