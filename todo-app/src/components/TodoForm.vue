@@ -1,5 +1,5 @@
 <template>
-  <q-form class="q-mb-md" @submit.prevent="onSubmit">
+  <form class="q-mb-md" @submit.prevent="onSubmit">
     <div class="row q-col-gutter-sm items-start">
       <div class="col">
         <q-input
@@ -23,7 +23,7 @@
         />
       </div>
     </div>
-  </q-form>
+  </form>
 </template>
 
 <script setup lang="ts">

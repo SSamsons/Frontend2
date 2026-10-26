@@ -7,7 +7,7 @@
       </q-card-section>
 
       <q-card-section>
-        <q-form @submit.prevent="onSubmit">
+        <form @submit.prevent="onSubmit">
           <q-input
             v-model="email"
             class="q-mb-sm"
@@ -39,7 +39,7 @@
             label="Войти"
             :loading="userStore.isLoading"
           />
-        </q-form>
+        </form>
       </q-card-section>
     </q-card>
   </q-page>
